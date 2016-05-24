@@ -1,0 +1,23 @@
+#
+# LDAP Defaults
+#
+
+# See ldap.conf(5) for details
+# This file should be world readable but not world writable.
+
+BASE   {{ suffix }}
+# For securtiy reasons, you would like to have ldaps... However,
+# currently I am having difficulties in getting this to work.
+#URI    ldaps://{{ suffix }}
+URI    ldap://{{ suffix }}
+
+#SIZELIMIT  12
+#TIMELIMIT  15
+#DEREF      never
+
+#TLS_CACERTDIR /etc/openldap/cacerts
+TLS_CACERT /etc/pki/tls/certs/ca-bundle.crt
+TLS_CERT /etc/pki/tls/certs/example.org.crt
+
+# Turning this off breaks GSSAPI used with krb5 when rdns = false
+SASL_NOCANON    on

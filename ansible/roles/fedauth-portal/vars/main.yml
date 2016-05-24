@@ -1,0 +1,4 @@
+---
+portal_fqdn: portal.example.org
+certificate: /etc/pki/tls/certs/example.org.crt
+private_key: /etc/pki/tls/private/example.org.key

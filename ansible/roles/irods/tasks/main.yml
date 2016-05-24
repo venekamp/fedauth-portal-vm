@@ -1,0 +1,61 @@
+---
+- name: Adding the user irods to the system for doing iRODS admin tasks
+  user: name=irods
+
+- name: Create ICAT db
+  command: "psql -f /vagrant/ansible/roles/irods/files/postgre_create_ICAT_db"
+  become_user: postgres
+  become: true
+
+- name: Copying local iRODS RPM to host
+  copy:
+    src=~/Downloads/irods-icat-{{ irods_version }}-centos7-x86_64.rpm
+    dest=/tmp/irods-icat-{{ irods_version }}-centos7-x86_64.rpm
+
+- name: Downloading iRODS RPM
+  get_url:
+    url=ftp://ftp.renci.org/pub/irods/releases/{{ irods_version }}/centos7/irods-icat-{{ irods_version }}-centos7-x86_64.rpm
+    dest=/tmp/irods-icat-{{ irods_version }}-centos7-x86_64.rpm
+
+- name: Installing iRODS
+  yum:
+    name=/tmp/irods-icat-{{ irods_version }}-centos7-x86_64.rpm
+    state=present
+
+- name: Copying local iRODS database plugin RPM to host
+  copy:
+    src=~/Downloads/irods-database-plugin-postgres-{{ irods_database_plugin_version }}-centos7-x86_64.rpm
+    dest=/tmp/irods-database-plugin-postgres-{{ irods_database_plugin_version }}-centos7-x86_64.rpm
+
+- name: Downloading iRODS database plugin
+  get_url:
+   url=ftp://ftp.renci.org/pub/irods/releases/{{ irods_version }}/centos7/irods-database-plugin-postgres-{{ irods_database_plugin_version }}-centos7-x86_64.rpm
+   dest=/tmp/irods-database-plugin-postgres-{{ irods_database_plugin_version }}-centos7-x86_64.rpm
+
+- name: Installing iRODS database plugin
+  yum:
+    name=/tmp/irods-database-plugin-postgres-{{ irods_database_plugin_version }}-centos7-x86_64.rpm
+    state=present
+
+- name: Running /var/lib/irods/packaging/setup_irods.sh
+  shell: /var/lib/irods/packaging/setup_irods.sh < /vagrant/ansible/roles/irods/files/setup_irods_answers
+  args:
+    creates: /etc/irods/service_account.config
+
+- name: Checking for user dummy for iRODS
+  command: iadmin lu dummy
+  become_user: irods
+  become: true
+  register: iadmin
+
+- name: Create dummy user for iRODS
+  command: iadmin mkuser dummy rodsuser
+  become_user: irods
+  become: true
+  when: '"No rows found" in iadmin.stdout'
+
+- name: Set password for user dummy in iRODS
+  command: iadmin moduser dummy password changeme
+  become_user: irods
+  become: true
+  when: '"No rows found" in iadmin.stdout'

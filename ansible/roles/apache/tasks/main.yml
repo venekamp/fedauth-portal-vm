@@ -1,0 +1,54 @@
+---
+- name: Installing apache with yum
+  yum:
+    name="{{ item }}"
+    state=latest
+  with_items:
+    - httpd
+    - mod_ssl
+
+- name: Copying signed certificate and private key
+  copy:
+    src={{ item.src }}
+    dest={{ item.dest }}
+    owner=root
+    group=apache
+    mode={{ item.mode }}
+  with_items:
+    - { src: roles/apache/files/example.org.crt, dest: /etc/pki/tls/certs/,   mode: "0644" }
+    - { src: roles/apache/files/example.org.key, dest: /etc/pki/tls/private/, mode: "0600" }
+
+    #  lineinfile:
+    #    dest=/etc/httpd/conf.d/ssl.conf
+    #    regexp={{ item.regexpr }}
+    #    line={{ item.line }}
+    #    #    regexp="^SSLCertificateFile"
+    #    #    line="SSLCertificateFile /etc/pki/tls/certs/example.org.crt"
+    #  with_items:
+    #    - { regexpr: "^SSLCertificateFile",      line: "SSLCertificateFile /etc/pki/tls/certs/example.org.crt"      }
+    #    - { regexpr: "^SSLCertificateKeyFile",   line: "SSLCertificateKeyFile /etc/pki/tls/private/example.org.key" }
+    #    - { regexpr: "^SSLCertificateChainFile", line: "SSLCertificateChainFile /etc/pki/tls/certs/example.org.crt" }
+    #
+    #- name: Setting SSLCertificateKeyFile location for Apache
+    #  lineinfile:
+    #    dest=/etc/httpd/conf.d/ssl.conf
+    #    regexp="^SSLCertificateKeyFile"
+    #    line="SSLCertificateKeyFile /etc/pki/tls/private/example.org.key"
+    #
+    #- name: Setting SSLCertificateChainFile location for Apache
+    #  lineinfile:
+    #    dest=/etc/httpd/conf.d/ssl.conf
+    #    regexp="^SSLCertificateChainFile"
+    #    line="SSLCertificateChainFile /etc/pki/tls/certs/example.org.crt"
+    #
+    #- name: Setting FQDN for Apache
+    #  lineinfile:
+    #    dest=/etc/httpd/conf/httpd.conf
+    #    insertafter="^#ServerName www.example.com:80"
+    #    line="ServerName www.example.org:80"
+
+- name: Starting Apache
+  service:
+    name=httpd
+    state=started
+    enabled=true

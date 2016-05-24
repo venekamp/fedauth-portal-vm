@@ -1,0 +1,9 @@
+---
+ldap_admin_passwd: 12345678
+suffix: "dc=portal,dc=example,dc=org"
+rootdn: "cn=admin,{{ suffix }}"
+organisation: Example
+machinename: portal
+
+ldap_certificate_file: "/etc/pki/tls/certs/irods-01_sara_vm_surfsara_nl.crt"
+ldap_certificate_key_file: "/etc/pki/tls/private/irods-01_sara_vm_surfsara_nl.key"

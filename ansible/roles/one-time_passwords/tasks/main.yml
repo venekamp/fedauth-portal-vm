@@ -1,0 +1,7 @@
+---
+- name: Installing PAM One-time passwords and dependencies
+  yum: name="{{ item }}"
+       state=latest
+  with_items:
+    - pam_oath
+    - oathtool

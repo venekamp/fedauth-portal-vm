@@ -1,0 +1,44 @@
+---
+- name: Creating RSA private key
+  command: openssl genrsa -out /etc/irods/server.key
+  become_user: irods
+  become: true
+  args:
+    creates: /etc/irods/server.key
+
+- name: Setting file permission on private key
+  file:
+    path=/etc/irods/server.key
+    mode=0640
+
+- name: Sign generated key
+  shell: openssl req -new -x509 -key /etc/irods/server.key -out /etc/irods/server.crt -days 365 < /vagrant/ansible/roles/irods_pam_authentication/files/certificate_info
+  become_user: irods
+  become: true
+  args:
+    creates: /etc/irods/server.crt
+
+- name: Setting file permission on signed key
+  file:
+    path=/etc/irods/server.crt
+    mode=0644
+
+- name: Generate Diffie–Hellman parameters
+  command: openssl dhparam -2 -out /etc/irods/dhparams.pem 2048
+  become_user: irods
+  become: true
+  args:
+    creates: /etc/irods/dhparams.pem
+
+- name: Setting file permission on Diffie-Hellman file
+  file:
+    path=/etc/irods/dhparams.pem
+    mode=0640
+
+- name: Copying PAM stack for iRODS
+  copy:
+    src=roles/irods_pam_authentication/files/pam.d/irods
+    dest=/etc/pam.d/irods
+    owner=irods
+    group=irods
+    mode=0644

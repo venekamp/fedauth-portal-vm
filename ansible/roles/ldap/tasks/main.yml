@@ -1,0 +1,58 @@
+---
+- name: Install LDAP and its dependancies
+  yum:
+    name={{ item }}
+    state=latest
+  with_items:
+    - openldap
+    - openldap-servers
+    - openldap-clients
+
+- name: Delete /etc/openldap/slapd.d/
+  file:
+    path=/etc/openldap/slapd.d
+    state=absent
+
+- name: Generating password hash for LDAP admin
+  command:
+    slappasswd -h {SSHA} -s {{ ldap_admin_passwd }}
+  register:
+    slappasswd
+
+- name: Create directory for ldif files
+  file:
+    path=ldifs
+    state=directory
+    owner=vagrant
+    group=vagrant
+    mode=0755
+
+- name: Create configuration files from template
+  template:
+    src={{ item.src }}
+    dest={{ item.dest }}
+    owner=root
+    group=root
+    mode=0644
+  with_items:
+    - { src: slapd.conf.j2,     dest: /etc/openldap/slapd.conf }
+    - { src: ldap.conf.j2,      dest: /etc/openldap/ldap.conf  }
+    - { src: add_admin.ldif.j2, dest: ldifs/add_admin.ldif     }
+
+- name: Copy DB_CONFIG
+  copy:
+    src=/usr/share/openldap-servers/DB_CONFIG.example
+    dest=/var/lib/ldap/DB_CONFIG
+    owner=root
+    group=root
+    mode=0600
+    remote_src=true
+
+- name: Starting slapd service
+  service:
+    name=slapd
+    state=started
+
+- name: Adding admin user to LDAP
+  command:
+    ldapadd -x -D {{ rootdn }} -w {{ ldap_admin_passwd }} -f ldifs/add_admin.ldif

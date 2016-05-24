@@ -1,0 +1,42 @@
+---
+- name: Installing xinetd with yum
+  yum: name=xinetd
+       state=latest
+
+- name: Installing authd with yum
+  yum: name=authd
+       state=latest
+
+- name: Copying auth to /etc/xinetd.d/
+  copy: src=./files/auth
+        dest=/etc/xinetd.d/
+        owner=root
+        group=root
+        mode=0600
+
+- name: Starting xinetd daemon
+  service: name=xinetd
+           state=started
+           enabled=true
+
+- name: Installing Postgresql and its dependancies via yum
+  yum: name="{{ item }}"
+       state=latest
+  with_items:
+    - postgresql
+    - postgresql-server
+    - openssl098e
+    - unixODBC
+    - perl
+    - authd
+    - postgresql-odbc
+
+- name: Initialize the postgreslq database
+  command: postgresql-setup initdb
+  args:
+    creates: /var/lib/pgsql/data/postgresql.conf
+
+- name: Start the Postgres database
+  service: name=postgresql
+           state=started
+           enabled=true

@@ -1,0 +1,86 @@
+---
+- name: Install simpleSAMLphp dependencies
+  yum:
+    name={{ item }}
+    state=latest
+  with_items:
+    - php
+    - php-xml
+    - php-mysql
+    - php-ldap
+    - php-mcrypt
+
+- name: Copying simpleSAMLphp tar ball
+  copy:
+    src=~/Downloads/simplesamlphp-{{ simplesamlphp_version }}.tar.gz
+    dest=/tmp/simplesamlphp-{{ simplesamlphp_version }}.tar.gz
+
+- name: Download simpleSAMLphp tar ball
+  get_url:
+    url=https://simplesamlphp.org/res/downloads/simplesamlphp-{{ simplesamlphp_version }}.tar.gz
+    dest=/tmp/simplesamlphp-{{ simplesamlphp_version }}.tar.gz
+
+- name: Untarring simpleSAMLphp
+  unarchive:
+    src=/tmp/simplesamlphp-{{ simplesamlphp_version }}.tar.gz
+    dest=/var
+    copy=no
+    creates=/var/simplesamlphp-{{ simplesamlphp_version }}
+
+- name: Create link to simpleSAMLphp
+  file:
+    src=/var/simplesamlphp-{{ simplesamlphp_version }}
+    dest=/var/simplesamlphp
+    state=link
+
+- name: Create salt
+  shell: tr -c -d '0123456789abcdefghijklmnopqrstuvwxyz' </dev/urandom | dd bs=32 count=1 2>/dev/null;echo
+  register: salt
+
+- name: Create config.php from template
+  template: |
+    src=config.php.j2
+    dest=/var/simplesamlphp/config/config.php
+    owner=root
+    group=root
+    mode=0644
+
+- name: Create authsources.php from template
+  template: |
+    src=authsources.php.j2
+    dest=/var/simplesamlphp/config/authsources.php
+    owner=root
+    group=root
+    mode=0644
+
+- name: Create saml20-idp-remote.php from template
+  template: |
+    src=saml20-idp-remote.php.j2
+    dest=/var/simplesamlphp/metadata/saml20-idp-remote.php
+    owner=root
+    group=root
+    mode=0644
+
+- name: Create key pair
+  shell: openssl req -new -x509 -days 3652 -nodes -out /var/simplesamlphp/cert/{{ certificate }} -keyout /var/simplesamlphp/cert/{{ private_key }} < /vagrant/ansible/roles/simpleSAMLphp/files/certificate_info
+    creates=/var/simplesamlphp/cert/{{ certificate }}
+
+- name: Setting permissions on key
+  command: find /var/simplesamlphp/cert/ -type f -exec chmod 0440 {} \; -exec chgrp apache {} \;
+
+- name: Obtain SURFconext certificate
+  get_url:
+    url=https://engine.surfconext.nl/authentication/idp/certificate
+    dest=/tmp/surfconext.pem
+
+- name: Determine fingerprint of SURFconext certificate
+  shell:
+    openssl x509 -noout -fingerprint -in "/tmp/surfconext.pem" | sed -e 's/.*=\(.*\)/\1/' -e 's/://g' | tr '[:upper:]' '[:lower:]'
+     creates=/tmp/surfconext.fingerprint
+  register: fingerprint
+
+- name: Insert fingerprint
+  lineinfile:
+    dest=/var/simplesamlphp/metadata/saml20-idp-remote.php
+    regexp="^.*'certFingerprint'.*=> array\('.*'\),"
+    line="    'certFingerprint'      => array('{{ fingerprint.stdout }}'),"
