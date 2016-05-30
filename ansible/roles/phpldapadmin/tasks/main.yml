@@ -1,0 +1,17 @@
+---
+- name: Install phpLDAPadmin and its dependencies
+  yum:
+    name={{ item }}
+    state=latest
+  with_items:
+    - phpldapadmin
+
+- name: Adding phpLDAPadmin to apachr
+  template:
+    src={{ item.src }}
+    dest={{ item.dest }}
+    owner=root
+    group=apache
+    mode=0640
+  with_items:
+    - { src: phpldapadmin.conf.j2, dest: /etc/httpd/conf.d/phpldapadmin.conf }

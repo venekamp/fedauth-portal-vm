@@ -18,3 +18,4 @@
     - { role: simpleSAMLphp, simplesamlphp_version: 1.14.3 }
     - { role: fedauth-portal }
     - { role: ldap }
+    - { role: phpldapadmin }
