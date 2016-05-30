@@ -1,3 +1,4 @@
 .vagrant/
 ansible/private.yml
 ansible/*.retry
+ansible/git_global_config.j2
