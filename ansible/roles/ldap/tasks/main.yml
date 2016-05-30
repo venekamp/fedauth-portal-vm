@@ -8,6 +8,11 @@
     - openldap-servers
     - openldap-clients
 
+    #- name: Checking slapd status
+    #  command: systemctl status slapd
+    #  register: slapd_status
+    #  failed_when: false
+
 - name: Delete /etc/openldap/slapd.d/
   file:
     path=/etc/openldap/slapd.d
@@ -56,3 +61,5 @@
 - name: Adding admin user to LDAP
   command:
     ldapadd -x -D {{ rootdn }} -w {{ ldap_admin_passwd }} -f ldifs/add_admin.ldif
+  register: result
+  failed_when: "(result.rc not in [0, 68])"
