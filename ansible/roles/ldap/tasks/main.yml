@@ -8,11 +8,6 @@
     - openldap-servers
     - openldap-clients
 
-    #- name: Checking slapd status
-    #  command: systemctl status slapd
-    #  register: slapd_status
-    #  failed_when: false
-
 - name: Delete /etc/openldap/slapd.d/
   file:
     path=/etc/openldap/slapd.d
@@ -44,21 +39,13 @@
     - { src: ldap.conf.j2,      dest: /etc/openldap/ldap.conf  }
     - { src: add_admin.ldif.j2, dest: ldifs/add_admin.ldif     }
 
-- name: Copy DB_CONFIG
-  copy:
-    src=/usr/share/openldap-servers/DB_CONFIG.example
-    dest=/var/lib/ldap/DB_CONFIG
-    owner=root
-    group=root
-    mode=0600
-    remote_src=true
-
 - name: Starting slapd service
   service:
     name=slapd
     state=started
 
 - name: Adding admin user to LDAP
+  become_user: vagrant
   command:
     ldapadd -x -D {{ rootdn }} -w {{ ldap_admin_passwd }} -f ldifs/add_admin.ldif
   register: result
