@@ -1,8 +1,8 @@
-dn: {{ suffix }}
+dn: {{ basedn }}
 objectclass: dcObject
 objectclass: organization
 o: {{ organisation }}
-dc: {{ machinename }}
+dc: {{ hostname }}
 
 dn: {{ rootdn }}
 objectclass: organizationalRole
