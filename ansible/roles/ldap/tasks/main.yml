@@ -35,9 +35,11 @@
     group=root
     mode=0644
   with_items:
-    - { src: slapd.conf.j2,     dest: /etc/openldap/slapd.conf }
-    - { src: ldap.conf.j2,      dest: /etc/openldap/ldap.conf  }
-    - { src: add_admin.ldif.j2, dest: ldifs/add_admin.ldif     }
+    - { src: slapd.conf.j2,                  dest: /etc/openldap/slapd.conf          }
+    - { src: ldap.conf.j2,                   dest: /etc/openldap/ldap.conf           }
+    - { src: add_admin.ldif.j2,              dest: ldifs/add_admin.ldif              }
+    - { src: add_group_and_populate.ldif.j2, dest: ldifs/add_group_and_populate.ldif }
+    - { src: add_users.ldif.j2,              dest: ldifs/add_users.ldif              }
 
 - name: Starting slapd service
   service:
@@ -47,6 +49,10 @@
 - name: Adding admin user to LDAP
   become_user: vagrant
   command:
-    ldapadd -x -D {{ rootdn }} -w {{ ldap_admin_passwd }} -f ldifs/add_admin.ldif
+    ldapadd -x -D {{ rootdn }} -w {{ ldap_admin_passwd }} -f ldifs/{{ item }}
   register: result
   failed_when: "(result.rc not in [0, 68])"
+  with_items:
+    - add_admin.ldif
+    - add_group_and_populate.ldif
+    - add_users.ldif
