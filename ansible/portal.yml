@@ -19,3 +19,4 @@
     - { role: fedauth-portal }
     - { role: ldap }
     - { role: phpldapadmin }
+    - { role: sssd }
