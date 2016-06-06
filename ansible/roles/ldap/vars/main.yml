@@ -6,5 +6,5 @@ organisation: Example
 hostname: portal
 domainname: example.org
 
-ldap_certificate_file: "/etc/pki/tls/certs/example.org.crt"
-ldap_certificate_key_file: "/etc/pki/tls/private/example.org.key"
+ldap_certificate_file: "/etc/pki/tls/certs/portal.example.org.crt"
+ldap_certificate_key_file: "/etc/pki/tls/private/portal.example.org.key"

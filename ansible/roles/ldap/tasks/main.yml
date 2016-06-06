@@ -40,6 +40,12 @@
     - { src: add_admin.ldif.j2,              dest: ldifs/add_admin.ldif              }
     - { src: add_group_and_populate.ldif.j2, dest: ldifs/add_group_and_populate.ldif }
     - { src: add_users.ldif.j2,              dest: ldifs/add_users.ldif              }
+    - { src: slapd.j2,                       dest: /etc/sysconfig/slapd              }
+
+- name: Concatenate known CAs and self signed key
+  shell: cat  /etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem /etc/pki/tls/certs/portal.example.org.crt > /etc/openldap/certs/certs.pem
+  args:
+    creates: /etc/openldap/certs/certs.pem
 
 - name: Starting slapd service
   service:

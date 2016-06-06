@@ -15,8 +15,8 @@ URI    ldaps://{{ hostname }}.{{ domainname }}
 #DEREF      never
 
 #TLS_CACERTDIR /etc/openldap/cacerts
-TLS_CACERT /etc/pki/tls/certs/ca-bundle.crt
-TLS_CERT /etc/pki/tls/certs/example.org.crt
+TLS_CACERT /etc/openldap/certs/certs.pem
+TLS_CERT /etc/pki/tls/certs/portal.example.org.crt
 
 # Turning this off breaks GSSAPI used with krb5 when rdns = false
 SASL_NOCANON    on

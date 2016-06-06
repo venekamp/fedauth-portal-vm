@@ -24,11 +24,6 @@
   command:
     openssl req -newkey rsa:2048 -nodes -keyout /etc/pki/tls/private/portal.example.org.key -x509 -days 365 -out /etc/pki/tls/certs/portal.example.org.crt -config ./openssl/openssl.conf
 
-- name: Concatenate known CAs and self signed key
-  shell: cat  /etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem /etc/pki/tls/certs/portal.example.org.crt > /etc/openldap/certs/certs.pem
-  args:
-    creates: /etc/openldap/certs/certs.pem
-
 - name: Starting Apache
   service:
     name=httpd

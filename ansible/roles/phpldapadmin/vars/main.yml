@@ -2,4 +2,4 @@
 allowed_ip_addresses: 10.0.0.0/8
 basedn: dc=portal,dc=example,dc=org
 rootdn: cn=admin,dc=portal,dc=example,dc=org
-ldap_endpoint: ldap://portal.example.org
+ldap_endpoint: ldaps://portal.example.org
