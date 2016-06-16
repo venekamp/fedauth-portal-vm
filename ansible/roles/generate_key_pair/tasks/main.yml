@@ -1,0 +1,56 @@
+---
+- name: Ensure ~root/openssl directory exists
+  file:
+    path: ~root/openssl
+    state: directory
+    mode: 0600
+  when: "{{ self_signed_key|default(True) }}"
+
+- name: Copy openssl.conf to openssl directory
+  template:
+    src=openssl.conf.j2
+    dest=~root/openssl/openssl.conf
+    owner=root
+    group=root
+    mode=0644
+  when: "{{ self_signed_key|default(True) }}"
+
+- name: Generate new certificate and private key
+  command:
+    openssl req -newkey {{ key_type }} -nodes -keyout {{ key_out }} -x509 -days 365 -out {{ cert_out }} -config ~root/openssl/openssl.conf
+  args:
+    creates: "{{ key_out }}"
+    #    creates: "{{ cert_out }}"
+  when: "{{ self_signed_key|default(True) }}"
+
+- name: Copy public key
+  file:
+    src: "{{ cert_in }}"
+    dest: "{{ cert_out }}"
+    owner: root
+    mode: 0644
+  when: not {{ self_signed_key|default(True) }}
+
+- name: Ensure dir exists
+  file:
+    path: /root/certs
+    state: directory
+    owner: root
+    mode: 0700
+  when: not {{ self_signed_key|default(True) }}
+
+- name: Copy CA cert
+  file:
+    src: "{{ ca_cert_in }}"
+    dest: "{{ ca_cert_out }}"
+    owner: root
+    mode: 0644
+  when: not {{ self_signed_key|default(True) }}
+
+- name: Copy private key
+  file:
+    src: "{{ key_in }}"
+    dest: "{{ key_out }}"
+    owner: root
+    mode: 0600
+  when: not {{ self_signed_key|default(True) }}
