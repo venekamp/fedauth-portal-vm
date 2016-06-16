@@ -3,12 +3,9 @@
   become_user: root
   become: true
 
-  tasks:
-    - name: Setting SELinux to permissive
-      selinux: policy=targeted state=permissive
-
   roles:
     - { role: hosts }
+    - { role: generate_key_pair }
     - { role: geerlingguy.ntp, ntp_timezone: Europe/Amsterdam, ntp_manage_config: true }
     - { role: postgresql }
     - { role: irods, irods_version: "4.1.8", irods_database_plugin_version: "1.8" }
