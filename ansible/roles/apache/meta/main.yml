@@ -1,0 +1,3 @@
+---
+dependencies:
+  - { role: generate_key_pair, key_type: "rsa:2048", key_out: "/etc/pki/tls/private/{{ hostname }}.{{ domainname }}.key", cert_out: "/etc/pki/tls/certs/{{ hostname }}.{{ domainname }}.crt" }
