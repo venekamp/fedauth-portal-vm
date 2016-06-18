@@ -7,23 +7,6 @@
     - httpd
     - mod_ssl
 
-- name: openssl dir
-  file:
-    path: openssl
-    state: directory
-
-- name: Copying openssl config file
-  template:
-    src=openssl.conf.j2
-    dest=openssl/openssl.conf
-    owner=root
-    group=apache
-    mode=0644
-
-- name: Generate new certificate and private key
-  command:
-    openssl req -newkey rsa:2048 -nodes -keyout /etc/pki/tls/private/portal.example.org.key -x509 -days 365 -out /etc/pki/tls/certs/portal.example.org.crt -config ./openssl/openssl.conf
-
 - name: Starting Apache
   service:
     name=httpd
