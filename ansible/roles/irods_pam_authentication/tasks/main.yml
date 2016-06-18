@@ -1,8 +1,8 @@
 ---
 - name: Creating RSA private key
-  command: openssl genrsa -out /etc/irods/server.key
   become_user: irods
   become: true
+  command: openssl genrsa -out /etc/irods/server.key
   args:
     creates: /etc/irods/server.key
 
@@ -11,10 +11,26 @@
     path=/etc/irods/server.key
     mode=0640
 
-- name: Sign generated key
-  shell: openssl req -new -x509 -key /etc/irods/server.key -out /etc/irods/server.crt -days 365 < /vagrant/ansible/roles/irods_pam_authentication/files/certificate_info
+- name: Ensure openssl dir exists
+  become_user: irods
+  file:
+    path: openssl
+    state: directory
+    mode: 0700
+
+- name: Copy openssl config
   become_user: irods
   become: true
+  template:
+    src: openssl_irods.conf.j2
+    dest: openssl/openssl_irods.conf
+    mode: 0600
+
+- name: Sign generated key
+  become_user: irods
+  become: true
+  #  shell: openssl req -new -x509 -key /etc/irods/server.key -out /etc/irods/server.crt -days 365 < /vagrant/ansible/roles/irods_pam_authentication/files/certificate_info
+  shell: openssl req -new -x509 -key /etc/irods/server.key -out /etc/irods/server.crt -config openssl/openssl_irods.conf
   args:
     creates: /etc/irods/server.crt
 
@@ -24,9 +40,9 @@
     mode=0644
 
 - name: Generate Diffie–Hellman parameters
-  command: openssl dhparam -2 -out /etc/irods/dhparams.pem 2048
   become_user: irods
   become: true
+  command: openssl dhparam -2 -out /etc/irods/dhparams.pem 2048
   args:
     creates: /etc/irods/dhparams.pem
 
