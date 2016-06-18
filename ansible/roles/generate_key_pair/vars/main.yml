@@ -1,4 +1,4 @@
 ---
 key_out: /etc/pki/tls/private/portal.example.org.key
-cert_out: /etc/pki/tls/certs/portal.examle.org.crt
+cert_out: /etc/pki/tls/certs/portal.example.org.crt
 key_type: "rsa:2048"
