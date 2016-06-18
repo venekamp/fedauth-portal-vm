@@ -11,7 +11,7 @@ Vagrant.configure(2) do |config|
 #  config.vm.synced_folder ".", "/vagrant", disabled: true
 
   config.vm.box = "centos72-vbox-ga"
-  config.vm.hostname = "portal"
+  config.vm.hostname = "portal.example.org"
 
   config.vm.provider "virtualbox" do |vbox|
     vbox.name = "portal"
