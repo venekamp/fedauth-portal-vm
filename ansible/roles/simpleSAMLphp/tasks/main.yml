@@ -1,4 +1,9 @@
 ---
+- name: Ensure selinux is set to permissive
+  selinux:
+    policy: targeted
+    state: permissive
+
 - name: Install simpleSAMLphp dependencies
   yum:
     name={{ item }}
@@ -64,6 +69,7 @@
 - name: Create key pair
   shell: openssl req -new -x509 -days 3652 -nodes -out /var/simplesamlphp/cert/{{ certificate }} -keyout /var/simplesamlphp/cert/{{ private_key }} < /vagrant/ansible/roles/simpleSAMLphp/files/certificate_info
     creates=/var/simplesamlphp/cert/{{ certificate }}
+  when: ansible_virtualization_type == "virtualbox"
 
 - name: Setting permissions on key
   command: find /var/simplesamlphp/cert/ -type f -exec chmod 0440 {} \; -exec chgrp apache {} \;
