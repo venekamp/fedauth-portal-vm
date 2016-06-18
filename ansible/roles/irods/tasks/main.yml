@@ -2,20 +2,47 @@
 - name: Adding the user irods to the system for doing iRODS admin tasks
   user: name=irods
 
+- name: "Ensure /tmp/{{ ansible_ssh_user }}/irods exists"
+  become_user: "{{ ansible_ssh_user }}"
+  become: True
+  file:
+    path: /tmp/{{ ansible_ssh_user }}/irods
+    state: directory
+    mode: 0755
+  when: ansible_virtualization_type != "virtualbox"
+
+- name: Ensure that database creation scripts exists
+  become_user: "{{ ansible_ssh_user }}"
+  copy:
+    src: roles/irods/files/postgre_create_ICAT_db
+    dest: /tmp/{{ ansible_ssh_user }}/irods/postgre_create_ICAT_db
+  when: ansible_virtualization_type != "virtualbox"
+
 - name: Create ICAT db
   command: "psql -f /vagrant/ansible/roles/irods/files/postgre_create_ICAT_db"
   become_user: postgres
   become: true
+  when: ansible_virtualization_type == "virtualbox"
+
+- name: Create ICAT db
+  become_user: postgres
+  become: true
+  command: psql -f /tmp/{{ ansible_ssh_user }}/irods/postgre_create_ICAT_db
+  when: ansible_virtualization_type != "virtualbox"
 
 - name: Copying local iRODS RPM to host
   copy:
     src=~/Downloads/irods-icat-{{ irods_version }}-centos7-x86_64.rpm
     dest=/tmp/irods-icat-{{ irods_version }}-centos7-x86_64.rpm
+  when: ansible_virtualization_type == "virtualbox"
 
 - name: Downloading iRODS RPM
+  become_user: "{{ ansible_ssh_user }}"
+  become: True
   get_url:
     url=ftp://ftp.renci.org/pub/irods/releases/{{ irods_version }}/centos7/irods-icat-{{ irods_version }}-centos7-x86_64.rpm
     dest=/tmp/irods-icat-{{ irods_version }}-centos7-x86_64.rpm
+  when: ansible_virtualization_type != "virtualbox"
 
 - name: Installing iRODS
   yum:
@@ -26,11 +53,26 @@
   copy:
     src=~/Downloads/irods-database-plugin-postgres-{{ irods_database_plugin_version }}-centos7-x86_64.rpm
     dest=/tmp/irods-database-plugin-postgres-{{ irods_database_plugin_version }}-centos7-x86_64.rpm
+    mode=0644
+  when: ansible_virtualization_type == "virtualbox"
 
-- name: Downloading iRODS database plugin
-  get_url:
-   url=ftp://ftp.renci.org/pub/irods/releases/{{ irods_version }}/centos7/irods-database-plugin-postgres-{{ irods_database_plugin_version }}-centos7-x86_64.rpm
-   dest=/tmp/irods-database-plugin-postgres-{{ irods_database_plugin_version }}-centos7-x86_64.rpm
+  # Disable this task for now, as the get_url module is known to be broken.
+  # Ansible 2.2.0 might contain the fix.
+  #- name: Downloading iRODS database plugin
+  #  become_user: "{{ ansible_ssh_user }}"
+  #  become: True
+  #  get_url:
+  #    url=ftp://ftp.renci.org/pub/irods/releases/{{ irods_version }}/centos7/irods-database-plugin-postgres-{{ irods_database_plugin_version }}-centos7-x86_64.rpm
+  #    dest=/tmp/irods-database-plugin-postgres-{{ irods_database_plugin_version }}-centos7-x86_64.rpm
+  #    mode=0644
+
+- name: temp task for downloading rpm. Check again with V2.2.0
+  become_user: "{{ ansible_ssh_user }}"
+  become: True
+  command: wget ftp://ftp.renci.org/pub/irods/releases/{{ irods_version }}/centos7/irods-database-plugin-postgres-{{ irods_database_plugin_version }}-centos7-x86_64.rpm -O /tmp/irods-database-plugin-postgres-{{ irods_database_plugin_version }}-centos7-x86_64.rpm
+  args:
+    creates:
+      /tmp/irods-database-plugin-postgres-{{ irods_database_plugin_version }}-centos7-x86_64.rpm
 
 - name: Installing iRODS database plugin
   yum:
@@ -41,6 +83,25 @@
   shell: /var/lib/irods/packaging/setup_irods.sh < /vagrant/ansible/roles/irods/files/setup_irods_answers
   args:
     creates: /etc/irods/service_account.config
+  when:
+    ansible_virtualization_type == "virtualbox"
+
+- name: Copy iRODS setup answers
+  become_user: "{{ ansible_ssh_user }}"
+  become: True
+  copy:
+    src: roles/irods/files/setup_irods_answers
+    dest: /tmp/{{ ansible_ssh_user }}/setup_irods_answers
+    mode: 0644
+  when:
+    ansible_virtualization_type != "virtualbox"
+
+- name: Running /var/lib/irods/packaging/setup_irods.sh
+  shell: /var/lib/irods/packaging/setup_irods.sh < /tmp/{{ ansible_ssh_user }}/setup_irods_answers
+  args:
+    creates: /etc/irods/service_account.config
+  when:
+    ansible_virtualization_type != "virtualbox"
 
 - name: Checking for user dummy for iRODS
   command: iadmin lu dummy
