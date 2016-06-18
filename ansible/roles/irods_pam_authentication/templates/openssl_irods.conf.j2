@@ -1,0 +1,27 @@
+[ ca ]
+default_ca                      = CA_example
+
+[ CA_example ]
+countryName_default             = NL
+stateOrProvinceName_default     = Noord-Holland
+localityName_default            = Amsterdam
+0.organizationName_default      = Example BV
+0.organizationalUnit_default    = IT
+commonName_default              = portal.example.org
+emailAddress_default            = it@{{ domainname }}
+
+[ req ]
+default_bits           			= 2048
+default_keyfile        			= keyfile.pem
+distinguished_name     			= req_distinguished_name
+prompt                 			= no
+output_password        			= mypass
+
+[ req_distinguished_name ]
+C                      			= NL
+ST                     			= Noord-Holland
+L                      			= Amsterdam
+O                      			= Example BV
+OU                     			= IT
+CN                     			= {{ hostname }}.{{ domainname }}
+emailAddress           			= it@{{ domainname }}
