@@ -23,8 +23,8 @@
   file:
     path=ldifs
     state=directory
-    owner=vagrant
-    group=vagrant
+    owner={{ ansible_ssh_user }}
+    group={{ ansible_ssh_user }}
     mode=0755
 
 - name: Create configuration files from template
@@ -43,7 +43,7 @@
     - { src: slapd.j2,                       dest: /etc/sysconfig/slapd              }
 
 - name: Concatenate known CAs and self signed key
-  shell: cat  /etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem /etc/pki/tls/certs/portal.example.org.crt > /etc/openldap/certs/certs.pem
+  shell: cat /etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem /etc/pki/tls/certs/{{ hostname }}.{{ domainname }}.crt > /etc/openldap/certs/certs.pem
   args:
     creates: /etc/openldap/certs/certs.pem
 
