@@ -46,7 +46,7 @@
 #    dest=/tmp/irods-icat-{{ irods_version }}-centos7-x86_64.rpm
 #  when: ansible_virtualization_type != "virtualbox"
 
-- name: temp task for downloading rpm. Check again with V2.2.0
+- name: temp task for downloading ICAT rpm. Check again with V2.2.0
   become_user: "{{ ansible_ssh_user }}"
   become: True
   command: wget ftp://ftp.renci.org/pub/irods/releases/{{ irods_version }}/centos7/irods-icat-{{ irods_version }}-centos7-x86_64.rpm -O /tmp/irods-icat-{{ irods_version }}-centos7-x86_64.rpm
@@ -64,7 +64,7 @@
     src=~/Downloads/irods-database-plugin-postgres-{{ irods_database_plugin_version }}-centos7-x86_64.rpm
     dest=/tmp/irods-database-plugin-postgres-{{ irods_database_plugin_version }}-centos7-x86_64.rpm
     mode=0644
-    #  when: ansible_virtualization_type == "virtualbox"
+  when: ansible_virtualization_type == "virtualbox"
 
   # Disable this task for now, as the get_url module is known to be broken.
   # Ansible 2.2.0 might contain the fix.
@@ -76,7 +76,7 @@
   #    dest=/tmp/irods-database-plugin-postgres-{{ irods_database_plugin_version }}-centos7-x86_64.rpm
   #    mode=0644
 
-- name: temp task for downloading rpm. Check again with V2.2.0
+- name: temp task for downloading DB rpm. Check again with V2.2.0
   become_user: "{{ ansible_ssh_user }}"
   become: True
   command: wget ftp://ftp.renci.org/pub/irods/releases/{{ irods_version }}/centos7/irods-database-plugin-postgres-{{ irods_database_plugin_version }}-centos7-x86_64.rpm -O /tmp/irods-database-plugin-postgres-{{ irods_database_plugin_version }}-centos7-x86_64.rpm
@@ -114,19 +114,19 @@
     ansible_virtualization_type != "virtualbox"
 
 - name: Checking for user dummy for iRODS
-  command: iadmin lu dummy
   become_user: irods
   become: true
+  command: iadmin lu dummy
   register: iadmin
 
 - name: Create dummy user for iRODS
-  command: iadmin mkuser dummy rodsuser
   become_user: irods
   become: true
+  command: iadmin mkuser dummy rodsuser
   when: '"No rows found" in iadmin.stdout'
 
 - name: Set password for user dummy in iRODS
-  command: iadmin moduser dummy password changeme
   become_user: irods
   become: true
+  command: iadmin moduser dummy password changeme
   when: '"No rows found" in iadmin.stdout'
