@@ -1,4 +1,10 @@
 ---
+- name: Set FQDN hostname
+  hostname:
+    name: "{{ hostname }}.{{ domainname }}"
+  when:
+    ansible_virtualization_type != "virtualbox"
+
 - name: Setting /etc/hosts
   template: |
     src=hosts.j2
