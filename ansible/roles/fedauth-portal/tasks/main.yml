@@ -9,16 +9,16 @@
 - name: Get portal from git
   git:
     repo=https://github.com/venekamp/fedauth-portal.git
-    dest=/home/vagrant/fedauth-portal
-  become_user: vagrant
+    dest=/home/{{ ansible_ssh_user }}/fedauth-portal
+  become_user: "{{ ansible_ssh_user }}"
 
 - name: Copy portal to /var/www/fedauth-portal
   shell:
     rsync -a {{ item.src }} {{ item.dest }}
   with_items:
-    - { src: /home/vagrant/fedauth-portal/fedauth-php, dest: /var/www/fedauth-portal/ }
-    - { src: /home/vagrant/fedauth-portal/public,      dest: /var/www/fedauth-portal/ }
-    - { src: /home/vagrant/fedauth-portal/cgi-bin/,    dest: /var/www/cgi-bin/ }
+    - { src: "/home/{{ ansible_ssh_user }}/fedauth-portal/fedauth-php", dest: /var/www/fedauth-portal/ }
+    - { src: "/home/{{ ansible_ssh_user }}/fedauth-portal/public",      dest: /var/www/fedauth-portal/ }
+    - { src: "/home/{{ ansible_ssh_user }}/fedauth-portal/cgi-bin/",    dest: /var/www/cgi-bin/ }
 
 - name: Create portal apache conf file from template
   template: |
