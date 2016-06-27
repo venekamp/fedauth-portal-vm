@@ -2,8 +2,8 @@ dn: {{ basedn }}
 objectclass: dcObject
 objectclass: organization
 o: {{ organisation }}
-dc: {{ hostname }}
+dc: {{ basedn | regex_replace('^dc=([^,]+).*$', '\\1') }}
 
-dn: {{ rootdn }}
+dn: cn={{ ldap_admin }},{{ basedn }}
 objectclass: organizationalRole
 cn: admin

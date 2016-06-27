@@ -8,15 +8,16 @@
 BASE   {{ basedn }}
 # For securtiy reasons, you would like to have ldaps... However,
 # currently I am having difficulties in getting this to work.
-URI    ldaps://{{ hostname }}.{{ domainname }}
+#URI    ldaps://{{ hostname }}.{{ domainname }}
+URI    ldap://{{ hostname }}.{{ domainname }}
 
 #SIZELIMIT  12
 #TIMELIMIT  15
 #DEREF      never
 
 #TLS_CACERTDIR /etc/openldap/cacerts
-TLS_CACERT /etc/openldap/certs/certs.pem
-TLS_CERT /etc/pki/tls/certs/portal.example.org.crt
+#TLS_CACERT {{ ldap_certs_bundle }}
+#TLS_CERT /etc/pki/tls/certs/{{ hostname }}.{{ domainname }}.crt
 
 # Turning this off breaks GSSAPI used with krb5 when rdns = false
 SASL_NOCANON    on

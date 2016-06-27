@@ -43,9 +43,9 @@
     - { src: slapd.j2,                       dest: /etc/sysconfig/slapd              }
 
 - name: Concatenate known CAs and self signed key
-  shell: cat /etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem /etc/pki/tls/certs/{{ hostname }}.{{ domainname }}.crt > /etc/openldap/certs/certs.pem
+  shell: cat /etc/pki/tls/certs/ca-bundle.crt /etc/pki/tls/certs/{{ hostname }}.{{ domainname }}.crt > {{ ldap_certs_bundle_plus }}
   args:
-    creates: /etc/openldap/certs/certs.pem
+    creates: "{{ ldap_certs_bundle_plus }}"
 
 - name: Starting slapd service
   service:
@@ -53,12 +53,15 @@
     state=started
 
 - name: Adding admin user to LDAP
-  become_user: vagrant
+  become_user: "{{ ansible_ssh_user }}"
+  become: True
   command:
-    ldapadd -x -D {{ rootdn }} -w {{ ldap_admin_passwd }} -f ldifs/{{ item }}
+    ldapadd -x -D cn={{ ldap_admin }},{{ basedn }} -w {{ ldap_admin_passwd }} -f ldifs/{{ item }}
   register: result
   failed_when: "(result.rc not in [0, 68])"
   with_items:
     - add_admin.ldif
     - add_group_and_populate.ldif
     - add_users.ldif
+  tags:
+    - test_this

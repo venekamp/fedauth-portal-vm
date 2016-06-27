@@ -1,11 +1,11 @@
 # Create the organisational unit group, which will contain all groups
-dn: ou=group,dc=portal,dc=example,dc=org
+dn: ou=group,{{ basedn }}
 ou: group
 objectClass: organizationalUnit
 objectClass: top
 
 # Add a group to the group container
-dn: cn=irodsuser,ou=group,dc=portal,dc=example,dc=org
+dn: cn=irodsuser,ou=group,{{ basedn }}
 objectClass: posixGroup
 objectClass: top
 cn: irodsuser
