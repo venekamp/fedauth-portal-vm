@@ -4,6 +4,7 @@
   become: true
 
   roles:
+    - { role: firewall }
     - { role: hosts }
     - { role: generate_key_pair }
     - { role: geerlingguy.ntp, ntp_timezone: Europe/Amsterdam, ntp_manage_config: true }
