@@ -1,5 +1,5 @@
 ---
-allowed_ip_addresses: 10.0.0.0/8
+allowed_ip_addresses: { ip: 10.0.0.0/8 }
 basedn: dc=portal,dc=example,dc=org
-rootdn: cn=admin,dc=portal,dc=example,dc=org
+ldap_admin: admin
 ldap_endpoint: ldaps://portal.example.org
