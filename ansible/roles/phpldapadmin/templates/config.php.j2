@@ -332,7 +332,7 @@ $servers->setValue('server','base',array('{{ basedn }}'));
    binds. */
 // $servers->setValue('login','bind_id','');
 #  $servers->setValue('login','bind_id','cn=Manager,dc=example,dc=com');
-$servers->setValue('login','bind_id','{{ rootdn }}');
+$servers->setValue('login','bind_id','cn={{ ldap_admin }},{{ basedn }}');
 
 /* Your LDAP password. If you specified an empty bind_id above, this MUST also
    be blank. */
