@@ -7,9 +7,13 @@
     group: root
     mode: 0644
   notify: restart firewall
+  when:
+    ansible_virtualization_type != "virtualbox"
 
 - name: Ensure the firewall is enables and starts on boot
   service:
     name: iptables
     state: started
     enabled: yes
+  when:
+    ansible_virtualization_type != "virtualbox"
