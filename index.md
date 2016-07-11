@@ -47,39 +47,42 @@ complete the registration at SURFconext for the meta data and release of
 required attributes before you will get an fully functional portal.
 
 # Vagrant and VirtualBox
+In case you do not have an environment in which you can easily create VMs or
+you wish to keep things local when trying out the provisioning, you
+can use Vagrant to create a VirtualBox machine. All that need to be done is to
+start the VM with:
 
+    `vagrant up`
 
-Download image
+In case the VM is nolonger needed it can be
+destroyed with:
+
+    vagrant destroy -f
+
+Access to this VM is achieved with:
+
+    vagrant ssh
+
+## Vagrant base image
+When Vagrant creates the VirtualBox VM, it needs a base image from which a new
+image is derived and used for the creation of the VM. Any `CentOS7.2` image
+could be used. However, the `centos72-vbox-ga` image has the VirtualBox Guest
+Additions installed. Although the provided Ansible scripts do not depend on
+this feature, it might be worth having. The `centos72-vbox-ga` base image can
+be downloaded from: [SURFdrive]()
 
 # Ansible
+The first step of getting a working environment is creating the virtual
+machine. This gives you a very basic image in which you can login into. The
+components that make up the portal are not there yet. The VM needs to be
+provisioned first. Ansible is used for this. It is recommened to use at least
+version 2.1.
 
-## Roles
+The different compontents are provisioned in diffrent roles. Listed below are
+all the roles used and their paramaters are explained.
 
-### Apache
-
-### fedauth-portal
-
-### firewall
-
-### geerlingy.ntp
-
-### generate_key_pair
-
-### hosts
-
-### irods
-
-### irods_pam_authentication
-
-### ldap
-
-### oath
-
-### phpldapadmin
-
-### postgresql
-
-### simpleSAMLphp
-
-### ssd
-
+| [apache](role-apache) | [hosts](role-hosts) | [phpldapadmin](role-phpldapadmin) |
+| [fedauth-portal](role-fedauth-portal) | [irods](role-irods) | [postgresql](role-postgresql) |
+| [firewall](role-firewall) | [irods_pam_authentication](role-irods_pam_authentication) | [simpleSAMLphp](role-simpleSAMLphp) |
+| [geerlingguy.ntp](role-geerlingguy.ntp.html) | [ldap](role-ldap) | [sssd](role-sssd) |
+| [generate_key_pair](role-generate_key_pair) | [oath](role-oath) | |
