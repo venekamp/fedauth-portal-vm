@@ -6,11 +6,14 @@
 
 - name: Configure sssd
   template:
-    src: sssd.conf.j2
-    dest: /etc/sssd/sssd.conf
+    src: {{ item.src }}
+    dest: {{ item.dest }}
     owner: root
     group: root
     mode: 0600
+  with_items:
+    - { src: "sssd.conf.j2",     dest: "/etc/sssd/sssd.conf" }
+    - { src: "nsswitch.conf.j2", dest: "/etc/nsswitch.conf"  }
 
 - name: Start sssd
   service:
