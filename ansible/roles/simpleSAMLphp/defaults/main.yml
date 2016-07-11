@@ -1,8 +1,8 @@
 ---
 simplesaml_version: 1.14.3
 admin_password: changeme
-technical_contact_name: Gerben Venekamp
-technical_contact_email: gerben.venekamp@surfsara.nl
+technical_contact_name: John Doe
+technical_contact_email: john.doe@example.org
 timezone: Europe/Amsterdam
 trusted_domains: "'localhost:4443', 'portal.example.org'"
 

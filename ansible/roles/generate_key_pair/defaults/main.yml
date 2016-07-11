@@ -6,7 +6,7 @@ key_type: "rsa:2048"
 country_name: NL
 state_or_province_name: Noord-Holland
 locality_name: Amsterdam
-organisation: SURFsara BV
+organisation: Example BV
 organisational_unit: IT
 email_unit: it
 default_bits: 2048
