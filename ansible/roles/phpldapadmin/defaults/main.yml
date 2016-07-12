@@ -3,4 +3,4 @@ allowed_ip_addresses:
   - { ip: 10.0.0.0/8 }
 basedn: dc=portal,dc=example,dc=org
 ldap_admin: admin
-ldap_endpoint: ldaps://portal.example.org
+ldap_endpoint: ldap://portal.example.org
