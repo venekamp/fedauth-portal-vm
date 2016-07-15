@@ -67,9 +67,8 @@
     mode=0644
 
 - name: Create key pair
-  shell: openssl req -new -x509 -days 3652 -nodes -out /var/simplesamlphp/cert/{{ certificate }} -keyout /var/simplesamlphp/cert/{{ private_key }} < /vagrant/ansible/roles/simpleSAMLphp/files/certificate_info
-    creates=/var/simplesamlphp/cert/{{ certificate }}
-  when: ansible_virtualization_type == "virtualbox"
+  shell: openssl req -new -x509 -days 3652 -nodes -config /root/openssl/openssl.conf -out /var/simplesamlphp/cert/saml.crt -keyout /var/simplesamlphp/cert/saml.key
+    creates=/var/simplesamlphp/cert/saml.crt
 
 - name: Setting permissions on key
   command: find /var/simplesamlphp/cert/ -type f -exec chmod 0440 {} \; -exec chgrp apache {} \;
